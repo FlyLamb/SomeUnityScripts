@@ -1,23 +1,18 @@
 /*
     A basic, prolly glitchy, not really optymised Physics Player Movement script.
     Written by bajtixone (https://github.com/Bajtix) (https://bajtix.xyz/)
-
     This script may not be the best, I might improve it in the future, but I just needed to get it working and I've decided to share it in case someone needs a quck solution.
     If for some weird reason you decide to use this script feel free to do so, I don't require credit, but if it's gonna be open source it'd be sick if you were to keep this comment.
-
     How to setup:
     Create an object (preferably an empty), move it into a separate layer.
     Drag script onto an object
     Right click the script name in the inspector
     Select [Setup Prefab] from the menu.
     Play around with the settings, make sure to disable the player layer from collision check.
-
     WARNING:
     If you change the player's height, you'll have to manually configure the `normalCheckerHeigh`, as it's not adjusted yet. To get the value, place the player somewhere and run the game. Disable the stair functionality, and
     when the playerfalls and touches ground, right click the script and select [Get Normal Checker Height]. Paste the value you got in the console to the `normalCheckerHeigh`.
-
     You have to handle the rotation yourself. 
-
     There are a few bugs that i know of and i'll list them here:
       BUG                 | DESCRIPTION                                                                          | VERDICT
     - acceleration issues | after landing, switching the directions quickly may result in getting a decent boost | Not gonna fix, seems cool for speedrunning like some of the bugs in HL2
@@ -160,7 +155,7 @@ public class BajtixPlayerController : MonoBehaviour {
         if(!isGrounded) {Debug.LogError("Not grounded!"); return;}
         stairChecker.localPosition = transform.InverseTransformDirection(SkipY(smoothedVelocity * Time.fixedDeltaTime * stairLookahead) + stepCheckY * Vector3.up);
         RaycastHit hit;
-        if(Physics.Raycast(stairChecker.position, Vector3.down, out hit, normalCheckerHeight + 0.5f, groundMask)) {
+        if(Physics.Raycast(stairChecker.position, Vector3.down, out hit, normalCheckerHeight + 0.5f, groundMask,  QueryTriggerInteraction.Ignore)) {
             var w = hit.distance - normalCheckerHeight;
             Debug.Log("Hit distance: " + hit.distance);
             
@@ -223,7 +218,7 @@ public class BajtixPlayerController : MonoBehaviour {
         if(!isGrounded) return;
         stairChecker.localPosition = transform.InverseTransformDirection(SkipY(smoothedVelocity * Time.fixedDeltaTime * stairLookahead) + stepCheckY * Vector3.up);
         RaycastHit hit;
-        if(Physics.Raycast(stairChecker.position, Vector3.down, out hit, normalCheckerHeight + 0.5f, groundMask)) {
+        if(Physics.Raycast(stairChecker.position, Vector3.down, out hit, normalCheckerHeight + 0.5f, groundMask,  QueryTriggerInteraction.Ignore)) {
             var w = hit.distance - normalCheckerHeight;
             //Debug.Log("Hit distance: " + hit.distance + "; Diff: " + (hit.distance - normalCheckerHeight));
             if(w < -0.01 && w > -stepHeight && Vector3.Angle(Vector3.up, hit.normal) < normalSteepPoint * 45) {
@@ -248,7 +243,7 @@ public class BajtixPlayerController : MonoBehaviour {
     bool CheckGroundClearence() {
         bool g = false;
         foreach(var w in groundCheckers) 
-            g |= Physics.Raycast(w.position,Vector3.down, 0.3f, groundMask);
+            g |= Physics.Raycast(w.position,Vector3.down, 0.3f, groundMask,  QueryTriggerInteraction.Ignore);
 
         return g;
     }
@@ -315,7 +310,7 @@ public class BajtixPlayerController : MonoBehaviour {
         Vector3 feetPosition = this.feetPosition + transform.position;
         foreach(var w in groundCheckers) {
             RaycastHit hit;
-            if(Physics.Raycast(w.position,Vector3.down, out hit, 0.3f,groundMask)) {
+            if(Physics.Raycast(w.position,Vector3.down, out hit, 0.3f,groundMask, QueryTriggerInteraction.Ignore)) {
                 normal += hit.normal;
             }
         }
